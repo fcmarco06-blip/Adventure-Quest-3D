@@ -2,506 +2,512 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Adventure Quest 3D</title>
 
 <style>
-* { box-sizing: border-box; }
-
+* { box-sizing:border-box; }
 body {
-  margin: 0;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #70c9ef;
-  user-select: none;
-  touch-action: none;
+  margin:0;
+  overflow:hidden;
+  background:#101b19;
+  font-family:Arial,sans-serif;
+  color:white;
+  touch-action:none;
 }
+#game { position:fixed; inset:0; }
+canvas { display:block; }
 
-canvas {
-  display: block;
+#top {
+  position:fixed;
+  top:15px;
+  left:15px;
+  right:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  pointer-events:none;
 }
-
-#titre {
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-size: 21px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-shadow: 0 3px 6px #23445c;
-  white-space: nowrap;
+.logo {
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-shadow:0 2px 8px black;
 }
-
-#pieces {
-  position: absolute;
-  top: 15px;
-  left: 14px;
-  background: linear-gradient(#34495e, #172633);
-  color: #ffe58a;
-  border: 2px solid #a9bac8;
-  border-radius: 14px;
-  padding: 10px 15px;
-  font-weight: bold;
-  box-shadow: 0 5px 12px #0007, inset 0 1px 3px #ffffff55;
+.coins {
+  background:#14251edb;
+  border:1px solid #d4ad54;
+  padding:10px 15px;
+  border-radius:25px;
+  font-weight:bold;
 }
-
+#controls {
+  position:fixed;
+  bottom:20px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  padding:0 20px;
+  pointer-events:none;
+}
 #joystick {
-  position: absolute;
-  left: 25px;
-  bottom: 35px;
-  width: 125px;
-  height: 125px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffffff22, #17263388);
-  border: 3px solid #ffffff88;
-  box-shadow: 0 5px 15px #0007, inset 0 3px 10px #0005;
-  touch-action: none;
+  width:115px;
+  height:115px;
+  border-radius:50%;
+  background:#ffffff22;
+  border:2px solid #ffffff66;
+  position:relative;
+  pointer-events:auto;
+  touch-action:none;
+  backdrop-filter:blur(5px);
 }
-
-#joystickCentre {
-  position: absolute;
-  width: 57px;
-  height: 57px;
-  left: 31px;
-  top: 31px;
-  border-radius: 50%;
-  background: linear-gradient(145deg,#e5edf3,#607586);
-  border: 3px solid #ffffff;
-  box-shadow: 0 5px 10px #0008, inset 0 3px 5px #ffffff;
+#stick {
+  width:48px;
+  height:48px;
+  background:linear-gradient(145deg,#d5d5d5,#666);
+  border:2px solid white;
+  border-radius:50%;
+  position:absolute;
+  top:31px;
+  left:31px;
+  box-shadow:0 3px 12px #0009;
 }
-
-.commandes {
-  position: absolute;
-  right: 20px;
-  bottom: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+#buttons {
+  display:grid;
+  grid-template-columns:repeat(2,65px);
+  gap:12px;
+  pointer-events:auto;
 }
-
-.bouton {
-  width: 78px;
-  height: 65px;
-  border-radius: 19px;
-  border: 2px solid #ffffff99;
-  color: white;
-  font-size: 11px;
-  font-weight: 900;
-  text-shadow: 0 2px 3px #0009;
-  box-shadow: 0 6px 0 #0005, 0 9px 15px #0007,
-              inset 0 2px 5px #ffffff88;
-  cursor: pointer;
-  touch-action: none;
-  transition: transform .08s, box-shadow .08s;
+.gamebtn {
+  width:62px;
+  height:62px;
+  border-radius:50%;
+  color:white;
+  font-weight:bold;
+  font-size:12px;
+  background:linear-gradient(145deg,#344b48,#101c1a);
+  border:2px solid #c4b47d;
+  box-shadow:0 4px 12px #0009;
+  touch-action:none;
 }
-
-.bouton:active, .bouton.actif {
-  transform: translateY(5px);
-  box-shadow: 0 1px 0 #0005, inset 0 3px 8px #0005;
+.gamebtn:active {
+  transform:scale(.91);
+  background:#9b8146;
 }
-
-#saut {
-  background: linear-gradient(145deg,#55c9ff,#0874c9);
-}
-
-#course {
-  background: linear-gradient(145deg,#ffc45d,#df7414);
-}
-
-#interaction {
-  background: linear-gradient(145deg,#70df9a,#16834a);
-}
-
-.icone {
-  display: block;
-  font-size: 25px;
-  margin-bottom: 3px;
-}
-
 #message {
-  position: absolute;
-  bottom: 180px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  text-shadow: 0 2px 5px black;
-  text-align: center;
-  width: 85%;
-  pointer-events: none;
+  position:fixed;
+  bottom:155px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#101d1bdc;
+  padding:10px 18px;
+  border-radius:20px;
+  font-size:12px;
+  pointer-events:none;
+  white-space:nowrap;
 }
-
-@media (min-width: 800px) {
-  #joystick { left: 50px; }
-  .commandes { right: 50px; }
+#loading {
+  position:fixed;
+  inset:0;
+  background:#101b19;
+  display:grid;
+  place-items:center;
+  z-index:10;
+  font-size:18px;
+  letter-spacing:2px;
 }
 </style>
 </head>
 
 <body>
+<div id="game"></div>
+<div id="loading">ADVENTURE QUEST 3D</div>
 
-<div id="titre">ADVENTURE QUEST 3D</div>
-<div id="pieces">🪙 <span id="compteur">0</span></div>
-
-<div id="joystick">
-  <div id="joystickCentre"></div>
+<div id="top">
+  <div class="logo">ADVENTURE QUEST</div>
+  <div class="coins">🪙 000</div>
 </div>
 
-<div class="commandes">
-  <button class="bouton" id="saut">
-    <span class="icone">⬆</span>SAUTER
-  </button>
-  <button class="bouton" id="course">
-    <span class="icone">⚡</span>COURIR
-  </button>
-  <button class="bouton" id="interaction">
-    <span class="icone">✋</span>INTERAGIR
-  </button>
+<div id="message">Explore ton nouveau monde</div>
+
+<div id="controls">
+  <div id="joystick"><div id="stick"></div></div>
+
+  <div id="buttons">
+    <button class="gamebtn" onclick="action('Parler')">○<br>PARLER</button>
+    <button class="gamebtn" onclick="action('Interagir')">△<br>INTERAGIR</button>
+    <button class="gamebtn" id="run">×<br>COURIR</button>
+    <button class="gamebtn" onclick="action('Sauter')">□<br>SAUTER</button>
+  </div>
 </div>
 
-<div id="message">Explore l'île et découvre ses trésors !</div>
+<script type="importmap">
+{
+ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+ }
+}
+</script>
 
 <script type="module">
-import * as THREE from
-'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 
-// SCÈNE
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x83d5f5);
-scene.fog = new THREE.Fog(0x83d5f5, 35, 100);
+scene.background = new THREE.Color(0x9bbbc0);
+scene.fog = new THREE.Fog(0x9bbbc0,35,115);
 
 const camera = new THREE.PerspectiveCamera(
-  65, window.innerWidth / window.innerHeight, 0.1, 150
+  65,innerWidth/innerHeight,0.1,300
 );
 
 const renderer = new THREE.WebGLRenderer({
-  antialias: true
+  antialias:true,
+  powerPreference:"high-performance"
 });
 
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-document.body.prepend(renderer.domElement);
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
 
-// LUMIÈRES
-scene.add(new THREE.HemisphereLight(0xffffff, 0x66835b, 2));
+document.getElementById('game').appendChild(renderer.domElement);
 
-const soleil = new THREE.DirectionalLight(0xffffff, 2);
-soleil.position.set(-10, 20, 10);
-scene.add(soleil);
+// LUMIÈRE
+scene.add(new THREE.HemisphereLight(0xc7e5ff,0x45552c,2));
 
-// OCÉAN
-const ocean = new THREE.Mesh(
-  new THREE.PlaneGeometry(200, 200),
+const sun = new THREE.DirectionalLight(0xffe3b0,3);
+sun.position.set(-30,45,25);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024,1024);
+scene.add(sun);
+
+// TEXTURE DU SOL
+function makeTexture(base,detail) {
+  const c=document.createElement('canvas');
+  c.width=c.height=256;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=base;
+  ctx.fillRect(0,0,256,256);
+
+  for(let i=0;i<4500;i++){
+    ctx.fillStyle=detail[Math.floor(Math.random()*detail.length)];
+    const x=Math.random()*256;
+    const y=Math.random()*256;
+    const s=Math.random()*3+1;
+    ctx.fillRect(x,y,s,s);
+  }
+
+  const t=new THREE.CanvasTexture(c);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping;
+  t.repeat.set(12,12);
+  t.colorSpace=THREE.SRGBColorSpace;
+  return t;
+}
+
+const groundTexture=makeTexture(
+ '#526d3e',['#617c46','#435c34','#73894d','#3d5934']
+);
+
+const ground=new THREE.Mesh(
+ new THREE.PlaneGeometry(250,250),
+ new THREE.MeshStandardMaterial({
+  map:groundTexture,
+  roughness:1
+ })
+);
+
+ground.rotation.x=-Math.PI/2;
+ground.receiveShadow=true;
+scene.add(ground);
+
+// COLLINES
+for(let i=0;i<18;i++){
+ const h=8+Math.random()*15;
+ const hill=new THREE.Mesh(
+  new THREE.ConeGeometry(12+Math.random()*15,h,7),
   new THREE.MeshStandardMaterial({
-    color: 0x168ec4,
-    roughness: 0.3,
-    metalness: 0.15
+   color:new THREE.Color().setHSL(
+    .27+Math.random()*.04,.25,.25+Math.random()*.12
+   ),
+   roughness:1
   })
-);
-ocean.rotation.x = -Math.PI / 2;
-ocean.position.y = -0.8;
-scene.add(ocean);
-
-// ÎLE
-const ile = new THREE.Mesh(
-  new THREE.CylinderGeometry(18, 19, 2, 64),
-  new THREE.MeshStandardMaterial({ color: 0xd8bd79 })
-);
-ile.position.y = -0.3;
-scene.add(ile);
-
-const herbe = new THREE.Mesh(
-  new THREE.CircleGeometry(17.7, 64),
-  new THREE.MeshStandardMaterial({ color: 0x55a94b })
-);
-herbe.rotation.x = -Math.PI / 2;
-herbe.position.y = 0.72;
-scene.add(herbe);
+ );
+ hill.position.set(
+  (Math.random()-.5)*150,
+  h/2-2,
+  -45-Math.random()*90
+ );
+ hill.receiveShadow=true;
+ scene.add(hill);
+}
 
 // ARBRES
-function arbre(x,z) {
-  const tronc = new THREE.Mesh(
-    new THREE.CylinderGeometry(.18,.3,2,8),
-    new THREE.MeshStandardMaterial({color:0x79502d})
-  );
-  tronc.position.set(x,1.5,z);
-  scene.add(tronc);
+function createTree(x,z,scale=1){
+ const trunk=new THREE.Mesh(
+  new THREE.CylinderGeometry(.25*scale,.45*scale,4*scale,8),
+  new THREE.MeshStandardMaterial({color:0x60412a})
+ );
+ trunk.position.set(x,2*scale,z);
+ trunk.castShadow=true;
+ scene.add(trunk);
 
-  const feuilles = new THREE.Mesh(
-    new THREE.SphereGeometry(1.15,10,9),
-    new THREE.MeshStandardMaterial({color:0x238444})
+ for(let i=0;i<3;i++){
+  const leaves=new THREE.Mesh(
+   new THREE.SphereGeometry(
+    (2.1-i*.25)*scale,9,8
+   ),
+   new THREE.MeshStandardMaterial({
+    color:[0x254b2c,0x315d32,0x426c38][i],
+    roughness:1
+   })
   );
-  feuilles.position.set(x,2.8,z);
-  feuilles.scale.set(1,1.2,1);
-  scene.add(feuilles);
+  leaves.position.set(
+   x,
+   (4.2+i*.85)*scale,
+   z
+  );
+  leaves.castShadow=true;
+  scene.add(leaves);
+ }
 }
 
-[
- [-10,-7],[-12,3],[-8,10],[10,9],
- [12,-4],[7,-12],[-3,12],[14,5]
-].forEach(p => arbre(p[0],p[1]));
+for(let i=0;i<110;i++){
+ const x=(Math.random()-.5)*105;
+ const z=(Math.random()-.5)*115;
+ if(Math.abs(x)<8 && Math.abs(z)<12)continue;
+ createTree(x,z,.7+Math.random()*.8);
+}
 
 // ROCHERS
-for(let i=0;i<14;i++){
-  const a = Math.random()*Math.PI*2;
-  const r = 10+Math.random()*5;
-  const rocher = new THREE.Mesh(
-    new THREE.DodecahedronGeometry(.5+Math.random()*.6),
-    new THREE.MeshStandardMaterial({color:0x858d89})
-  );
-  rocher.position.set(Math.cos(a)*r,.9,Math.sin(a)*r);
-  scene.add(rocher);
+for(let i=0;i<35;i++){
+ const rock=new THREE.Mesh(
+  new THREE.DodecahedronGeometry(
+   .7+Math.random()*1.5,1
+  ),
+  new THREE.MeshStandardMaterial({
+   color:0x77796c,
+   roughness:1
+  })
+ );
+ rock.position.set(
+  (Math.random()-.5)*100,
+  .6,
+  (Math.random()-.5)*100
+ );
+ rock.rotation.set(Math.random(),Math.random(),Math.random());
+ rock.scale.y=.65;
+ rock.castShadow=true;
+ scene.add(rock);
 }
+
+// PETIT LAC
+const water=new THREE.Mesh(
+ new THREE.CircleGeometry(15,64),
+ new THREE.MeshStandardMaterial({
+  color:0x327f91,
+  roughness:.22,
+  metalness:.15
+ })
+);
+water.rotation.x=-Math.PI/2;
+water.position.set(19,.035,-22);
+scene.add(water);
 
 // PERSONNAGE
-const joueur = new THREE.Group();
-scene.add(joueur);
+const player=new THREE.Group();
+scene.add(player);
 
-const peau = new THREE.MeshStandardMaterial({color:0xffc18b});
-const vetement = new THREE.MeshStandardMaterial({color:0x2675d8});
-const pantalon = new THREE.MeshStandardMaterial({color:0x26364c});
+const skin=new THREE.MeshStandardMaterial({color:0xc58d68});
+const clothes=new THREE.MeshStandardMaterial({
+ color:0x344b43,roughness:.8
+});
+const dark=new THREE.MeshStandardMaterial({color:0x292c2a});
 
-function partie(geo, mat, x,y,z) {
-  const m = new THREE.Mesh(geo,mat);
-  m.position.set(x,y,z);
-  joueur.add(m);
-  return m;
+const body=new THREE.Mesh(
+ new THREE.CapsuleGeometry(.42,.85,5,10),
+ clothes
+);
+body.position.y=1.25;
+body.castShadow=true;
+player.add(body);
+
+const head=new THREE.Mesh(
+ new THREE.SphereGeometry(.32,16,16),
+ skin
+);
+head.position.y=2.05;
+head.castShadow=true;
+player.add(head);
+
+const hair=new THREE.Mesh(
+ new THREE.SphereGeometry(.34,12,10,0,Math.PI*2,0,Math.PI*.55),
+ dark
+);
+hair.position.y=2.16;
+player.add(hair);
+
+const legs=[];
+for(let i=0;i<2;i++){
+ const leg=new THREE.Mesh(
+  new THREE.CapsuleGeometry(.16,.55,4,8),
+  dark
+ );
+ leg.position.set(i===0?-.22:.22,.42,0);
+ leg.castShadow=true;
+ player.add(leg);
+ legs.push(leg);
 }
 
-partie(new THREE.CapsuleGeometry(.42,.65,4,8),vetement,0,1.15,0);
-partie(new THREE.SphereGeometry(.34,16,12),peau,0,1.95,0);
+// CAMÉRA
+player.position.set(0,0,0);
+camera.position.set(0,4,8);
 
-const jambe1 = partie(
-  new THREE.BoxGeometry(.23,.65,.25),pantalon,-.18,.48,0
-);
-const jambe2 = partie(
-  new THREE.BoxGeometry(.23,.65,.25),pantalon,.18,.48,0
-);
+let moveX=0,moveY=0;
+let running=false;
+let jumping=false;
+let jumpHeight=0;
+let angle=0;
+let walkTime=0;
 
-joueur.position.set(0,.75,0);
-
-// VISAGE
-const oeilMat = new THREE.MeshBasicMaterial({color:0x202020});
-partie(new THREE.SphereGeometry(.045,8,8),oeilMat,-.12,2,.29);
-partie(new THREE.SphereGeometry(.045,8,8),oeilMat,.12,2,.29);
-
-// TRÉSORS
-const tresors = [];
-
-for(let i=0;i<9;i++){
-  const a = i*Math.PI*2/9;
-  const r = 5+Math.random()*7;
-
-  const piece = new THREE.Mesh(
-    new THREE.TorusGeometry(.35,.11,8,20),
-    new THREE.MeshStandardMaterial({
-      color:0xffd32a,
-      metalness:.8,
-      roughness:.2
-    })
-  );
-
-  piece.position.set(Math.cos(a)*r,1.3,Math.sin(a)*r);
-  scene.add(piece);
-  tresors.push(piece);
+function action(name){
+ document.getElementById('message').textContent=
+ name==='Sauter'?'Saut !':
+ name==='Parler'?'Aucun personnage à proximité pour parler':
+ name==='Interagir'?'Rien à proximité pour interagir':
+ name;
+ if(name==='Sauter' && !jumping){
+  jumping=true;
+  jumpHeight=0;
+ }
 }
 
-// COMMANDES
-let axeX=0, axeY=0;
-let courir=false, vitesseY=0, auSol=true;
-let compteur=0, animationTemps=0;
+// JOYSTICK
+const joy=document.getElementById('joystick');
+const stick=document.getElementById('stick');
+let active=false;
 
-const joystick=document.getElementById('joystick');
-const centre=document.getElementById('joystickCentre');
+function joystickMove(e){
+ const r=joy.getBoundingClientRect();
+ const cx=r.left+r.width/2;
+ const cy=r.top+r.height/2;
+ let dx=e.clientX-cx;
+ let dy=e.clientY-cy;
+ const max=35;
+ const d=Math.hypot(dx,dy);
+ if(d>max){dx=dx/d*max;dy=dy/d*max;}
+ moveX=dx/max;
+ moveY=dy/max;
+ stick.style.transform=`translate(${dx}px,${dy}px)`;
+}
 
-let joystickActif=false;
-
-joystick.addEventListener('pointerdown',e=>{
-  joystickActif=true;
-  joystick.setPointerCapture(e.pointerId);
-  deplacerJoystick(e);
+joy.addEventListener('pointerdown',e=>{
+ active=true;
+ joy.setPointerCapture(e.pointerId);
+ joystickMove(e);
 });
 
-joystick.addEventListener('pointermove',e=>{
-  if(joystickActif) deplacerJoystick(e);
+joy.addEventListener('pointermove',e=>{
+ if(active)joystickMove(e);
 });
 
-function deplacerJoystick(e){
-  const r=joystick.getBoundingClientRect();
-  let x=e.clientX-(r.left+r.width/2);
-  let y=e.clientY-(r.top+r.height/2);
-  const distance=Math.hypot(x,y);
-  const limite=35;
-
-  if(distance>limite){
-    x=x/distance*limite;
-    y=y/distance*limite;
-  }
-
-  centre.style.transform=`translate(${x}px,${y}px)`;
-  axeX=x/limite;
-  axeY=y/limite;
+function resetJoy(){
+ active=false;
+ moveX=moveY=0;
+ stick.style.transform='translate(0,0)';
 }
 
-function arreterJoystick(){
-  joystickActif=false;
-  axeX=0;
-  axeY=0;
-  centre.style.transform='translate(0,0)';
-}
+joy.addEventListener('pointerup',resetJoy);
+joy.addEventListener('pointercancel',resetJoy);
 
-joystick.addEventListener('pointerup',arreterJoystick);
-joystick.addEventListener('pointercancel',arreterJoystick);
+// COURIR
+const run=document.getElementById('run');
+run.addEventListener('pointerdown',()=>running=true);
+run.addEventListener('pointerup',()=>running=false);
+run.addEventListener('pointercancel',()=>running=false);
+run.addEventListener('pointerleave',()=>running=false);
 
 // CLAVIER
-const touches={};
-
 window.addEventListener('keydown',e=>{
-  touches[e.key.toLowerCase()]=true;
+ if(e.key==='Shift')running=true;
+ if(e.key==='ArrowUp'||e.key==='w')moveY=-1;
+ if(e.key==='ArrowDown'||e.key==='s')moveY=1;
+ if(e.key==='ArrowLeft'||e.key==='a')moveX=-1;
+ if(e.key==='ArrowRight'||e.key==='d')moveX=1;
 });
-
 window.addEventListener('keyup',e=>{
-  touches[e.key.toLowerCase()]=false;
-});
-
-function sauter(){
-  if(auSol){
-    vitesseY=8;
-    auSol=false;
-  }
-}
-
-document.getElementById('saut').addEventListener('pointerdown',sauter);
-
-const boutonCourse=document.getElementById('course');
-
-boutonCourse.addEventListener('pointerdown',e=>{
-  courir=true;
-  boutonCourse.classList.add('actif');
-});
-
-function arreterCourse(){
-  courir=false;
-  boutonCourse.classList.remove('actif');
-}
-
-boutonCourse.addEventListener('pointerup',arreterCourse);
-boutonCourse.addEventListener('pointercancel',arreterCourse);
-boutonCourse.addEventListener('lostpointercapture',arreterCourse);
-
-// INTERACTION AVEC LES TRÉSORS
-document.getElementById('interaction').addEventListener('pointerdown',()=>{
-  let trouve=false;
-
-  tresors.forEach((piece,i)=>{
-    if(piece.visible && joueur.position.distanceTo(piece.position)<2.5){
-      piece.visible=false;
-      compteur++;
-      trouve=true;
-    }
-  });
-
-  document.getElementById('compteur').textContent=compteur;
-
-  document.getElementById('message').textContent=
-    trouve ? '✨ Trésor découvert !' : 'Approche-toi d’un trésor !';
+ if(e.key==='Shift')running=false;
+ if(['ArrowUp','ArrowDown','w','s'].includes(e.key))moveY=0;
+ if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))moveX=0;
 });
 
 // ANIMATION
-const horloge=new THREE.Clock();
+const clock=new THREE.Clock();
+const target=new THREE.Vector3();
 
-function animer(){
-  requestAnimationFrame(animer);
+function animate(){
+ requestAnimationFrame(animate);
 
-  const delta=Math.min(horloge.getDelta(),.04);
-  animationTemps+=delta;
+ const dt=Math.min(clock.getDelta(),.05);
+ const moving=Math.abs(moveX)+Math.abs(moveY)>.1;
 
-  // DÉPLACEMENT
-  let x=axeX;
-  let z=axeY;
+ if(moving){
+  const speed=running?8:4;
+  const forward=new THREE.Vector3(moveX,0,moveY);
+  forward.normalize();
 
-  if(touches['arrowleft']||touches['q']||touches['a']) x-=1;
-  if(touches['arrowright']||touches['d']) x+=1;
-  if(touches['arrowup']||touches['z']||touches['w']) z-=1;
-  if(touches['arrowdown']||touches['s']) z+=1;
-  if(touches['shift']) courir=true;
-  else if(!boutonCourse.matches(':active')) courir=false;
+  player.position.x+=forward.x*speed*dt;
+  player.position.z+=forward.z*speed*dt;
 
-  const longueur=Math.hypot(x,z);
+  angle=Math.atan2(forward.x,forward.z);
+  player.rotation.y=angle;
 
-  if(longueur>1){x/=longueur;z/=longueur;}
+  walkTime+=dt*(running?13:8);
+  legs[0].rotation.x=Math.sin(walkTime)*.65;
+  legs[1].rotation.x=-Math.sin(walkTime)*.65;
+ }else{
+  legs[0].rotation.x=0;
+  legs[1].rotation.x=0;
+ }
 
-  const vitesse=courir?8:4.5;
-
-  if(longueur>.05){
-    joueur.position.x+=x*vitesse*delta;
-    joueur.position.z+=z*vitesse*delta;
-
-    joueur.rotation.y=Math.atan2(x,z);
-
-    const mouvement=Math.sin(animationTemps*12)*.4*longueur;
-    jambe1.rotation.x=mouvement;
-    jambe2.rotation.x=-mouvement;
-  }else{
-    jambe1.rotation.x=0;
-    jambe2.rotation.x=0;
+ if(jumping){
+  jumpHeight+=dt*2.8;
+  body.position.y=1.25+Math.sin(jumpHeight*Math.PI)*1.3;
+  if(jumpHeight>=1){
+   jumping=false;
+   jumpHeight=0;
+   body.position.y=1.25;
   }
+ }
 
-  // LIMITES DE L'ÎLE
-  const distance=Math.hypot(joueur.position.x,joueur.position.z);
+ target.set(
+  player.position.x-Math.sin(angle)*.5,
+  3.6,
+  player.position.z+8
+ );
 
-  if(distance>16){
-    joueur.position.x*=16/distance;
-    joueur.position.z*=16/distance;
-  }
+ camera.position.lerp(target,.08);
+ camera.lookAt(
+  player.position.x,
+  player.position.y+1.4,
+  player.position.z
+ );
 
-  // SAUT
-  vitesseY-=20*delta;
-  joueur.position.y+=vitesseY*delta;
-
-  if(joueur.position.y<=.75){
-    joueur.position.y=.75;
-    vitesseY=0;
-    auSol=true;
-  }
-
-  // TRÉSORS TOURNANTS
-  tresors.forEach(piece=>{
-    if(piece.visible){
-      piece.rotation.y+=delta*2;
-      piece.position.y=1.3+Math.sin(animationTemps*2)*.15;
-    }
-  });
-
-  // CAMÉRA SUIVEUSE
-  const positionCamera=new THREE.Vector3(
-    joueur.position.x,
-    joueur.position.y+5,
-    joueur.position.z+9
-  );
-
-  camera.position.lerp(positionCamera,Math.min(1,delta*5));
-  camera.lookAt(
-    joueur.position.x,
-    joueur.position.y+1,
-    joueur.position.z
-  );
-
-  renderer.render(scene,camera);
+ renderer.render(scene,camera);
 }
 
-animer();
-
-// ADAPTATION DE L'ÉCRAN
 window.addEventListener('resize',()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
 });
+
+document.getElementById('loading').style.display='none';
+animate();
 </script>
 </body>
 </html>
