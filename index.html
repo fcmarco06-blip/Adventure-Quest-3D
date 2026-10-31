@@ -2,500 +2,412 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Adventure Quest 3D</title>
 
 <style>
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  overflow:hidden;
-  background:#101b19;
-  font-family:Arial,sans-serif;
-  color:white;
-  touch-action:none;
-}
-#game { position:fixed; inset:0; }
-canvas { display:block; }
-
-#top {
-  position:fixed;
-  top:15px;
-  left:15px;
-  right:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  pointer-events:none;
-}
-.logo {
-  font-size:17px;
-  font-weight:900;
-  letter-spacing:2px;
-  text-shadow:0 2px 8px black;
-}
-.coins {
-  background:#14251edb;
-  border:1px solid #d4ad54;
-  padding:10px 15px;
-  border-radius:25px;
-  font-weight:bold;
-}
-#controls {
-  position:fixed;
-  bottom:20px;
-  left:0;
-  right:0;
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  padding:0 20px;
-  pointer-events:none;
-}
-#joystick {
-  width:115px;
-  height:115px;
-  border-radius:50%;
-  background:#ffffff22;
-  border:2px solid #ffffff66;
-  position:relative;
-  pointer-events:auto;
-  touch-action:none;
-  backdrop-filter:blur(5px);
-}
-#stick {
-  width:48px;
-  height:48px;
-  background:linear-gradient(145deg,#d5d5d5,#666);
-  border:2px solid white;
-  border-radius:50%;
-  position:absolute;
-  top:31px;
-  left:31px;
-  box-shadow:0 3px 12px #0009;
-}
-#buttons {
-  display:grid;
-  grid-template-columns:repeat(2,65px);
-  gap:12px;
-  pointer-events:auto;
-}
-.gamebtn {
-  width:62px;
-  height:62px;
-  border-radius:50%;
-  color:white;
-  font-weight:bold;
-  font-size:12px;
-  background:linear-gradient(145deg,#344b48,#101c1a);
-  border:2px solid #c4b47d;
-  box-shadow:0 4px 12px #0009;
-  touch-action:none;
-}
-.gamebtn:active {
-  transform:scale(.91);
-  background:#9b8146;
-}
-#message {
-  position:fixed;
-  bottom:155px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#101d1bdc;
-  padding:10px 18px;
-  border-radius:20px;
-  font-size:12px;
-  pointer-events:none;
-  white-space:nowrap;
-}
-#loading {
-  position:fixed;
-  inset:0;
-  background:#101b19;
-  display:grid;
-  place-items:center;
-  z-index:10;
-  font-size:18px;
-  letter-spacing:2px;
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#101a19;color:white;font-family:Arial,sans-serif;touch-action:none}
+#game{position:fixed;inset:0}
+canvas{display:block}
+.hud{position:fixed;inset:0;pointer-events:none}
+.brand{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-weight:900;font-size:clamp(15px,3vw,24px);letter-spacing:2px;text-shadow:0 2px 8px #000}
+.panel{position:absolute;background:#101a1cce;border:1px solid #c5a45c;border-radius:18px;padding:9px 13px;box-shadow:0 3px 14px #0008}
+.coins{top:15px;left:15px;font-weight:bold}
+.map{position:absolute;top:65px;left:14px;width:90px;height:90px;border-radius:50%;border:3px solid #c7a45c;background:radial-gradient(circle,#466c43,#172d24);display:grid;place-items:center;box-shadow:0 3px 12px #000}
+.map:after{content:"N";position:absolute;top:5px;font-weight:bold}
+.playerinfo{position:absolute;top:15px;right:14px;background:#14201ddc;border:1px solid #b99b5b;border-radius:25px;padding:8px 12px;font-size:11px}
+.bar{width:100px;height:9px;border-radius:10px;background:#333;margin:3px 0;overflow:hidden}
+.hp{height:100%;width:100%;background:linear-gradient(90deg,#a91818,#ff5555)}
+.mp{height:100%;width:100%;background:linear-gradient(90deg,#1265c3,#48caff)}
+#controls{position:fixed;inset:0;pointer-events:none}
+.btn{position:absolute;width:65px;height:65px;border-radius:50%;border:2px solid #d0b46d;background:linear-gradient(145deg,#34423e,#101817);color:white;box-shadow:0 4px 12px #000a;font-weight:bold;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;touch-action:none}
+.btn strong{font-size:23px}
+.btn:active{transform:scale(.92);filter:brightness(1.4)}
+#talk{right:18px;top:35%;width:61px;height:61px}
+#interact{left:22%;bottom:25px}
+#jump{left:17px;bottom:22px;border-color:#a58af5}
+#sword{left:17px;top:190px}
+#bag{left:17px;top:115px}
+#run{right:20px;bottom:30px}
+#joystick{position:absolute;right:18px;bottom:25px;width:112px;height:112px;border-radius:50%;background:#ffffff20;border:2px solid #ffffff77;pointer-events:auto;touch-action:none;backdrop-filter:blur(5px)}
+#stick{position:absolute;left:31px;top:31px;width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#ddd,#777);border:2px solid white;box-shadow:0 3px 10px #000}
+#message{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:10px 17px;border-radius:20px;background:#111b19c9;font-size:12px;white-space:nowrap;opacity:0;transition:opacity .3s}
+@media(orientation:portrait){
+ #message{top:43%}
 }
 </style>
 </head>
-
 <body>
 <div id="game"></div>
-<div id="loading">ADVENTURE QUEST 3D</div>
 
-<div id="top">
-  <div class="logo">ADVENTURE QUEST</div>
-  <div class="coins">🪙 000</div>
+<div class="hud">
+ <div class="brand">✦ ADVENTURE QUEST 3D ✦</div>
+ <div class="panel coins">🪙 000</div>
+ <div class="map">🧭</div>
+ <div class="playerinfo">
+  <b>NIVEAU 1</b>
+  <div>❤️ <div class="bar"><div class="hp"></div></div></div>
+  <div>⚡ <div class="bar"><div class="mp"></div></div></div>
+ </div>
+ <div id="message"></div>
 </div>
 
-<div id="message">Explore ton nouveau monde</div>
-
 <div id="controls">
-  <div id="joystick"><div id="stick"></div></div>
-
-  <div id="buttons">
-    <button class="gamebtn" onclick="action('Parler')">○<br>PARLER</button>
-    <button class="gamebtn" onclick="action('Interagir')">△<br>INTERAGIR</button>
-    <button class="gamebtn" id="run">×<br>COURIR</button>
-    <button class="gamebtn" onclick="action('Sauter')">□<br>SAUTER</button>
-  </div>
+ <button class="btn" id="bag"><strong>🎒</strong>SAC</button>
+ <button class="btn" id="sword"><strong>⚔</strong>ÉPÉE</button>
+ <button class="btn" id="jump"><strong>□</strong>SAUTER</button>
+ <button class="btn" id="interact"><strong>△</strong>INTERAGIR</button>
+ <button class="btn" id="talk"><strong>○</strong>PARLER</button>
+ <button class="btn" id="run"><strong>×</strong>COURIR</button>
+ <div id="joystick"><div id="stick"></div></div>
 </div>
 
 <script type="importmap">
-{
- "imports":{
-  "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
- }
-}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
 </script>
 
 <script type="module">
 import * as THREE from 'three';
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9bbbc0);
-scene.fog = new THREE.Fog(0x9bbbc0,35,115);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9ab8c4);
+scene.fog=new THREE.FogExp2(0x9ab8c4,.008);
 
-const camera = new THREE.PerspectiveCamera(
-  65,innerWidth/innerHeight,0.1,300
-);
-
-const renderer = new THREE.WebGLRenderer({
-  antialias:true,
-  powerPreference:"high-performance"
-});
-
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,350);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
 document.getElementById('game').appendChild(renderer.domElement);
 
-// LUMIÈRE
-scene.add(new THREE.HemisphereLight(0xc7e5ff,0x45552c,2));
-
-const sun = new THREE.DirectionalLight(0xffe3b0,3);
-sun.position.set(-30,45,25);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024,1024);
+// LUMIÈRES
+scene.add(new THREE.HemisphereLight(0xcde6ff,0x39482b,2.1));
+const sun=new THREE.DirectionalLight(0xffe6c0,3);
+sun.position.set(-35,55,25);
+sun.castShadow=true;
+sun.shadow.mapSize.set(1536,1536);
+sun.shadow.camera.left=-45;
+sun.shadow.camera.right=45;
+sun.shadow.camera.top=45;
+sun.shadow.camera.bottom=-45;
 scene.add(sun);
 
-// TEXTURE DU SOL
-function makeTexture(base,detail) {
-  const c=document.createElement('canvas');
-  c.width=c.height=256;
-  const ctx=c.getContext('2d');
-  ctx.fillStyle=base;
-  ctx.fillRect(0,0,256,256);
-
-  for(let i=0;i<4500;i++){
-    ctx.fillStyle=detail[Math.floor(Math.random()*detail.length)];
-    const x=Math.random()*256;
-    const y=Math.random()*256;
-    const s=Math.random()*3+1;
-    ctx.fillRect(x,y,s,s);
-  }
-
-  const t=new THREE.CanvasTexture(c);
-  t.wrapS=t.wrapT=THREE.RepeatWrapping;
-  t.repeat.set(12,12);
-  t.colorSpace=THREE.SRGBColorSpace;
-  return t;
+// TEXTURES PROCÉDURALES
+function texture(base,colors,scale=1){
+ const canvas=document.createElement('canvas');
+ canvas.width=512;canvas.height=512;
+ const ctx=canvas.getContext('2d');
+ ctx.fillStyle=base;ctx.fillRect(0,0,512,512);
+ for(let i=0;i<16000;i++){
+  ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
+  const x=Math.random()*512,y=Math.random()*512;
+  const s=Math.random()*3+0.5;
+  ctx.globalAlpha=.15+Math.random()*.5;
+  ctx.fillRect(x,y,s,s);
+ }
+ ctx.globalAlpha=1;
+ const t=new THREE.CanvasTexture(canvas);
+ t.wrapS=t.wrapT=THREE.RepeatWrapping;
+ t.repeat.set(scale,scale);
+ t.colorSpace=THREE.SRGBColorSpace;
+ return t;
 }
 
-const groundTexture=makeTexture(
- '#526d3e',['#617c46','#435c34','#73894d','#3d5934']
+const grass=texture('#536d3b',['#81964d','#304d2c','#6d8542','#405e31'],9);
+const dirt=texture('#735c43',['#a18a67','#493b30','#887151','#594934'],5);
+const bark=texture('#533624',['#805338','#30231a','#9a6940'],2);
+const stone=texture('#77776e',['#aaa99a','#494c49','#8d8b7c'],2);
+
+function material(map,roughness=1){
+ return new THREE.MeshStandardMaterial({map,roughness});
+}
+
+// TERRAIN
+const terrain=new THREE.Mesh(
+ new THREE.PlaneGeometry(300,300),
+ material(grass)
 );
+terrain.rotation.x=-Math.PI/2;
+terrain.receiveShadow=true;
+scene.add(terrain);
 
-const ground=new THREE.Mesh(
- new THREE.PlaneGeometry(250,250),
- new THREE.MeshStandardMaterial({
-  map:groundTexture,
-  roughness:1
- })
+// CHEMIN
+const path=new THREE.Mesh(
+ new THREE.PlaneGeometry(7,105),
+ material(dirt)
 );
+path.rotation.x=-Math.PI/2;
+path.position.set(0,.025,-35);
+scene.add(path);
 
-ground.rotation.x=-Math.PI/2;
-ground.receiveShadow=true;
-scene.add(ground);
+// COLLISIONS
+const obstacles=[];
+function obstacle(x,z,r){obstacles.push({x,z,r})}
 
-// COLLINES
-for(let i=0;i<18;i++){
- const h=8+Math.random()*15;
- const hill=new THREE.Mesh(
-  new THREE.ConeGeometry(12+Math.random()*15,h,7),
-  new THREE.MeshStandardMaterial({
-   color:new THREE.Color().setHSL(
-    .27+Math.random()*.04,.25,.25+Math.random()*.12
-   ),
-   roughness:1
-  })
+// ROCHERS
+for(let i=0;i<65;i++){
+ const x=(Math.random()-.5)*90;
+ const z=(Math.random()-.5)*100;
+ if(Math.abs(x)<6 && z<5 && z>-60)continue;
+ const size=.6+Math.random()*1.5;
+ const rock=new THREE.Mesh(
+  new THREE.DodecahedronGeometry(size,2),
+  new THREE.MeshStandardMaterial({map:stone,roughness:.95})
  );
- hill.position.set(
-  (Math.random()-.5)*150,
-  h/2-2,
-  -45-Math.random()*90
- );
- hill.receiveShadow=true;
- scene.add(hill);
+ rock.position.set(x,size*.55,z);
+ rock.scale.set(1,.7+Math.random()*.5,.9);
+ rock.rotation.set(Math.random(),Math.random(),Math.random());
+ rock.castShadow=true;rock.receiveShadow=true;
+ scene.add(rock);
+ obstacle(x,z,size*.9);
 }
 
 // ARBRES
-function createTree(x,z,scale=1){
- const trunk=new THREE.Mesh(
-  new THREE.CylinderGeometry(.25*scale,.45*scale,4*scale,8),
-  new THREE.MeshStandardMaterial({color:0x60412a})
- );
- trunk.position.set(x,2*scale,z);
- trunk.castShadow=true;
- scene.add(trunk);
+function tree(x,z,s){
+ const group=new THREE.Group();
+ group.position.set(x,0,z);
+ group.scale.setScalar(s);
 
- for(let i=0;i<3;i++){
+ const trunk=new THREE.Mesh(
+  new THREE.CylinderGeometry(.25,.48,4,12),
+  material(bark)
+ );
+ trunk.position.y=2;
+ trunk.castShadow=true;
+ group.add(trunk);
+
+ for(let i=0;i<4;i++){
   const leaves=new THREE.Mesh(
-   new THREE.SphereGeometry(
-    (2.1-i*.25)*scale,9,8
-   ),
+   new THREE.IcosahedronGeometry(2.2-i*.25,3),
    new THREE.MeshStandardMaterial({
-    color:[0x254b2c,0x315d32,0x426c38][i],
+    color:[0x294d2c,0x386239,0x496e39,0x315631][i],
     roughness:1
    })
   );
   leaves.position.set(
-   x,
-   (4.2+i*.85)*scale,
-   z
+   (Math.random()-.5)*.5,
+   4.2+i*.85,
+   (Math.random()-.5)*.5
   );
+  leaves.scale.set(1,1.15,.95);
   leaves.castShadow=true;
-  scene.add(leaves);
+  group.add(leaves);
  }
+ scene.add(group);
+ obstacle(x,z,1.15*s);
 }
 
-for(let i=0;i<110;i++){
+for(let i=0;i<95;i++){
  const x=(Math.random()-.5)*105;
- const z=(Math.random()-.5)*115;
- if(Math.abs(x)<8 && Math.abs(z)<12)continue;
- createTree(x,z,.7+Math.random()*.8);
+ const z=(Math.random()-.5)*120;
+ if(Math.abs(x)<7 && z<5 && z>-60)continue;
+ tree(x,z,.8+Math.random()*.65);
 }
 
-// ROCHERS
-for(let i=0;i<35;i++){
- const rock=new THREE.Mesh(
-  new THREE.DodecahedronGeometry(
-   .7+Math.random()*1.5,1
-  ),
-  new THREE.MeshStandardMaterial({
-   color:0x77796c,
-   roughness:1
-  })
+// MONTAGNES
+for(let i=0;i<17;i++){
+ const h=12+Math.random()*20;
+ const mountain=new THREE.Mesh(
+  new THREE.ConeGeometry(13+Math.random()*10,h,8),
+  new THREE.MeshStandardMaterial({color:0x586b63,roughness:1})
  );
- rock.position.set(
-  (Math.random()-.5)*100,
-  .6,
-  (Math.random()-.5)*100
- );
- rock.rotation.set(Math.random(),Math.random(),Math.random());
- rock.scale.y=.65;
- rock.castShadow=true;
- scene.add(rock);
+ mountain.position.set((Math.random()-.5)*150,h/2-3,-85-Math.random()*80);
+ scene.add(mountain);
 }
 
-// PETIT LAC
+// EAU
 const water=new THREE.Mesh(
- new THREE.CircleGeometry(15,64),
+ new THREE.PlaneGeometry(30,85),
  new THREE.MeshStandardMaterial({
-  color:0x327f91,
-  roughness:.22,
-  metalness:.15
+  color:0x348b9d,metalness:.2,roughness:.23,
+  transparent:true,opacity:.9
  })
 );
 water.rotation.x=-Math.PI/2;
-water.position.set(19,.035,-22);
+water.position.set(20,.08,-30);
 scene.add(water);
 
 // PERSONNAGE
 const player=new THREE.Group();
 scene.add(player);
 
-const skin=new THREE.MeshStandardMaterial({color:0xc58d68});
-const clothes=new THREE.MeshStandardMaterial({
- color:0x344b43,roughness:.8
-});
-const dark=new THREE.MeshStandardMaterial({color:0x292c2a});
+const clothes=new THREE.MeshStandardMaterial({color:0x263d3a,roughness:.8});
+const leather=new THREE.MeshStandardMaterial({color:0x55402e});
+const skin=new THREE.MeshStandardMaterial({color:0xb9825d});
+const gold=new THREE.MeshStandardMaterial({color:0xc6a45e,metalness:.65,roughness:.3});
 
-const body=new THREE.Mesh(
- new THREE.CapsuleGeometry(.42,.85,5,10),
- clothes
-);
-body.position.y=1.25;
-body.castShadow=true;
-player.add(body);
+function addPart(geometry,mat,x,y,z){
+ const m=new THREE.Mesh(geometry,mat);
+ m.position.set(x,y,z);
+ m.castShadow=true;
+ player.add(m);
+ return m;
+}
 
-const head=new THREE.Mesh(
- new THREE.SphereGeometry(.32,16,16),
- skin
-);
-head.position.y=2.05;
-head.castShadow=true;
-player.add(head);
+const torso=addPart(new THREE.CapsuleGeometry(.43,.75,7,12),clothes,0,1.25,0);
+addPart(new THREE.SphereGeometry(.29,20,20),skin,0,2.08,0);
+addPart(new THREE.SphereGeometry(.31,16,12,0,Math.PI*2,0,Math.PI*.55),leather,0,2.18,0);
 
-const hair=new THREE.Mesh(
- new THREE.SphereGeometry(.34,12,10,0,Math.PI*2,0,Math.PI*.55),
- dark
-);
-hair.position.y=2.16;
-player.add(hair);
+// Cape
+const cape=addPart(new THREE.BoxGeometry(.78,1.15,.12),clothes,0,1.05,.39);
+cape.rotation.x=-.08;
 
-const legs=[];
+// Belt
+addPart(new THREE.BoxGeometry(.9,.12,.5),leather,0,.95,0);
+addPart(new THREE.BoxGeometry(.16,.16,.08),gold,0,.95,-.27);
+
+// Bras et jambes
+const limbs=[];
 for(let i=0;i<2;i++){
- const leg=new THREE.Mesh(
-  new THREE.CapsuleGeometry(.16,.55,4,8),
-  dark
- );
- leg.position.set(i===0?-.22:.22,.42,0);
- leg.castShadow=true;
- player.add(leg);
- legs.push(leg);
+ const side=i===0?-1:1;
+ const arm=addPart(new THREE.CapsuleGeometry(.13,.53,5,8),leather,side*.52,1.35,0);
+ arm.rotation.z=-side*.2;
+ const leg=addPart(new THREE.CapsuleGeometry(.16,.6,5,8),leather,side*.22,.43,0);
+ limbs.push({arm,leg});
 }
 
-// CAMÉRA
-player.position.set(0,0,0);
-camera.position.set(0,4,8);
+// ÉPÉE DANS LE DOS
+const sword=new THREE.Group();
+const blade=new THREE.Mesh(
+ new THREE.BoxGeometry(.11,.95,.045),
+ new THREE.MeshStandardMaterial({color:0xbac9ce,metalness:.85,roughness:.2})
+);
+blade.position.y=.5;sword.add(blade);
+const handle=new THREE.Mesh(
+ new THREE.CylinderGeometry(.045,.045,.32,8),leather
+);
+handle.position.y=-.12;sword.add(handle);
+sword.position.set(.35,1.45,.4);
+sword.rotation.z=-.25;
+player.add(sword);
 
-let moveX=0,moveY=0;
-let running=false;
-let jumping=false;
-let jumpHeight=0;
-let angle=0;
-let walkTime=0;
-
-function action(name){
- document.getElementById('message').textContent=
- name==='Sauter'?'Saut !':
- name==='Parler'?'Aucun personnage à proximité pour parler':
- name==='Interagir'?'Rien à proximité pour interagir':
- name;
- if(name==='Sauter' && !jumping){
-  jumping=true;
-  jumpHeight=0;
- }
-}
-
-// JOYSTICK
+// CONTRÔLES
+let mx=0,my=0,running=false,jumping=false,jumpTime=0;
 const joy=document.getElementById('joystick');
 const stick=document.getElementById('stick');
 let active=false;
 
-function joystickMove(e){
+function moveJoystick(e){
  const r=joy.getBoundingClientRect();
- const cx=r.left+r.width/2;
- const cy=r.top+r.height/2;
- let dx=e.clientX-cx;
- let dy=e.clientY-cy;
- const max=35;
- const d=Math.hypot(dx,dy);
+ let dx=e.clientX-(r.left+r.width/2);
+ let dy=e.clientY-(r.top+r.height/2);
+ const d=Math.hypot(dx,dy),max=34;
  if(d>max){dx=dx/d*max;dy=dy/d*max;}
- moveX=dx/max;
- moveY=dy/max;
+ mx=dx/max;my=dy/max;
  stick.style.transform=`translate(${dx}px,${dy}px)`;
 }
 
 joy.addEventListener('pointerdown',e=>{
- active=true;
- joy.setPointerCapture(e.pointerId);
- joystickMove(e);
+ active=true;joy.setPointerCapture(e.pointerId);moveJoystick(e);
 });
-
-joy.addEventListener('pointermove',e=>{
- if(active)joystickMove(e);
-});
-
-function resetJoy(){
- active=false;
- moveX=moveY=0;
- stick.style.transform='translate(0,0)';
+joy.addEventListener('pointermove',e=>{if(active)moveJoystick(e)});
+function reset(){
+ active=false;mx=my=0;stick.style.transform='translate(0,0)';
 }
+joy.addEventListener('pointerup',reset);
+joy.addEventListener('pointercancel',reset);
 
-joy.addEventListener('pointerup',resetJoy);
-joy.addEventListener('pointercancel',resetJoy);
-
-// COURIR
 const run=document.getElementById('run');
 run.addEventListener('pointerdown',()=>running=true);
 run.addEventListener('pointerup',()=>running=false);
 run.addEventListener('pointercancel',()=>running=false);
 run.addEventListener('pointerleave',()=>running=false);
 
+function notify(text){
+ const el=document.getElementById('message');
+ el.textContent=text;el.style.opacity=1;
+ clearTimeout(window.msgTimer);
+ window.msgTimer=setTimeout(()=>el.style.opacity=0,1800);
+}
+
+document.getElementById('jump').onclick=()=>{
+ if(!jumping){jumping=true;jumpTime=0;}
+};
+document.getElementById('sword').onclick=()=>notify("Épée équipée");
+document.getElementById('bag').onclick=()=>notify("Inventaire bientôt disponible");
+document.getElementById('talk').onclick=()=>notify("Aucun joueur à proximité");
+document.getElementById('interact').onclick=()=>notify("Aucun objet à proximité");
+
 // CLAVIER
 window.addEventListener('keydown',e=>{
+ if(e.key==='ArrowUp'||e.key==='w')my=-1;
+ if(e.key==='ArrowDown'||e.key==='s')my=1;
+ if(e.key==='ArrowLeft'||e.key==='a')mx=-1;
+ if(e.key==='ArrowRight'||e.key==='d')mx=1;
  if(e.key==='Shift')running=true;
- if(e.key==='ArrowUp'||e.key==='w')moveY=-1;
- if(e.key==='ArrowDown'||e.key==='s')moveY=1;
- if(e.key==='ArrowLeft'||e.key==='a')moveX=-1;
- if(e.key==='ArrowRight'||e.key==='d')moveX=1;
 });
 window.addEventListener('keyup',e=>{
+ if(['ArrowUp','ArrowDown','w','s'].includes(e.key))my=0;
+ if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))mx=0;
  if(e.key==='Shift')running=false;
- if(['ArrowUp','ArrowDown','w','s'].includes(e.key))moveY=0;
- if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))moveX=0;
 });
 
-// ANIMATION
+// CAMÉRA ET DÉPLACEMENT
+camera.position.set(0,4,8);
 const clock=new THREE.Clock();
-const target=new THREE.Vector3();
+const desiredCamera=new THREE.Vector3();
+const lookTarget=new THREE.Vector3();
+let facing=0;
 
 function animate(){
  requestAnimationFrame(animate);
-
- const dt=Math.min(clock.getDelta(),.05);
- const moving=Math.abs(moveX)+Math.abs(moveY)>.1;
+ const dt=Math.min(clock.getDelta(),.04);
+ const moving=Math.hypot(mx,my)>.12;
 
  if(moving){
-  const speed=running?8:4;
-  const forward=new THREE.Vector3(moveX,0,moveY);
-  forward.normalize();
+  const speed=running?7:3.5;
+  const dx=mx*speed*dt;
+  const dz=my*speed*dt;
 
-  player.position.x+=forward.x*speed*dt;
-  player.position.z+=forward.z*speed*dt;
+  // TEST DES COLLISIONS
+  function blocked(x,z){
+   for(const o of obstacles){
+    if(Math.hypot(x-o.x,z-o.z)<o.r+.48)return true;
+   }
+   return false;
+  }
 
-  angle=Math.atan2(forward.x,forward.z);
-  player.rotation.y=angle;
+  if(!blocked(player.position.x+dx,player.position.z))
+   player.position.x+=dx;
 
-  walkTime+=dt*(running?13:8);
-  legs[0].rotation.x=Math.sin(walkTime)*.65;
-  legs[1].rotation.x=-Math.sin(walkTime)*.65;
+  if(!blocked(player.position.x,player.position.z+dz))
+   player.position.z+=dz;
+
+  facing=Math.atan2(mx,my);
+  player.rotation.y=facing;
+
+  const swing=performance.now()*.009*(running?1.5:1);
+  limbs[0].leg.rotation.x=Math.sin(swing)*.55;
+  limbs[1].leg.rotation.x=-Math.sin(swing)*.55;
+  limbs[0].arm.rotation.x=-Math.sin(swing)*.35;
+  limbs[1].arm.rotation.x=Math.sin(swing)*.35;
  }else{
-  legs[0].rotation.x=0;
-  legs[1].rotation.x=0;
+  limbs.forEach(l=>{
+   l.leg.rotation.x=0;
+   l.arm.rotation.x=0;
+  });
  }
 
  if(jumping){
-  jumpHeight+=dt*2.8;
-  body.position.y=1.25+Math.sin(jumpHeight*Math.PI)*1.3;
-  if(jumpHeight>=1){
-   jumping=false;
-   jumpHeight=0;
-   body.position.y=1.25;
-  }
+  jumpTime+=dt*2.6;
+  const h=Math.sin(Math.min(jumpTime,1)*Math.PI)*1.15;
+  player.position.y=h;
+  if(jumpTime>=1){jumping=false;player.position.y=0;}
  }
 
- target.set(
-  player.position.x-Math.sin(angle)*.5,
-  3.6,
+ desiredCamera.set(
+  player.position.x-Math.sin(facing)*.8,
+  player.position.y+4,
   player.position.z+8
  );
-
- camera.position.lerp(target,.08);
- camera.lookAt(
-  player.position.x,
-  player.position.y+1.4,
-  player.position.z
- );
+ camera.position.lerp(desiredCamera,.075);
+ lookTarget.set(player.position.x,player.position.y+1.3,player.position.z);
+ camera.lookAt(lookTarget);
 
  renderer.render(scene,camera);
 }
@@ -506,7 +418,6 @@ window.addEventListener('resize',()=>{
  renderer.setSize(innerWidth,innerHeight);
 });
 
-document.getElementById('loading').style.display='none';
 animate();
 </script>
 </body>
